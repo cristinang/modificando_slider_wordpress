@@ -54,6 +54,7 @@ window.onload = function() {
                 let height_global_d = dame_equivalencia_owlheight(pagina);
                 let transform_global_d = dame_equivalencia_transform(pagina);
 
+
                 let padre = document.getElementsByClassName("owl-stage-outer owl-height");
 
                 let elemento_padre = padre[0];
@@ -70,6 +71,8 @@ window.onload = function() {
                 let style2 = elemento_padre2.getAttribute('style');
                 console.log("el transform antes de cambiarlo es: " + style2);
 
+
+
                 //cambiamos el valor del atributo 
                 //esperar 1 segundo para que se cargue el slider
                 setTimeout(function() {
@@ -77,6 +80,10 @@ window.onload = function() {
                     console.log('el height es: ' + height_global_d);
                     elemento_padre2.setAttribute('style', 'transform:' + transform_global_d);
                     console.log('el transform es: ' + transform_global_d);
+                    elemento_hover.setAttribute('style', 'padding: 0% 7.5%; margin: 0px 0%; min-height: 335px;');
+                    console.log('el hover es: ' + hover_global_d);
+
+
                 }, 0);
 
 
@@ -148,6 +155,8 @@ window.onload = function() {
         //le añadimos la clase hidden al elemento active	
         //active.classList.add('hidden');
     }
+
+
 
 
 
@@ -601,5 +610,4 @@ function dame_equivalencia_owlheight(heightttt) {
             break;
 
     }
-
 }
