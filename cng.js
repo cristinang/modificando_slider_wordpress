@@ -28,32 +28,34 @@ window.onload = function() {
         });
     });
 
-    /////////FUNCIONAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////
-    let nodos_hijos = div_padre.childNodes;
-    let nodo_identificado = nodos_hijos[1];
 
+
+
+    // Si la url es la misma que https... muestrame en consola "es la url", si no, "no es la url"
     if (compararUrl('https://www.subaquaticamagazine.es/subaquatica-magazine-edicion-adci-septiembre-octubre-2023/')) {
         console.log('es la url');
     } else {
         console.log('no es la url');
+        // encuentra la url en la que estamos con window.location.shearch y añadimos paramentro "pagina" y lo mostramos en la url
         if (encontrar_en_url()) {
             console.log('encontrado');
             let params = new URLSearchParams(window.location.search);
-
             let existe = params.has("pagina");
+            // si existe, muestrame la clase active, ocultamelo del slider actual, muestrame sus atributos y espera un segundo para que se cargue el slider y SINO (else) muestrame "no existe" 
+
             if (existe) {
                 console.log('existe');
                 let pagina = params.get("pagina");
                 console.log('la página de la url es: ' + pagina);
                 //let pag_actual = dame_pagina_actual();
 
+                // mostramos la clase active y la ocultamos del slider actual (0)
                 let active = document.getElementsByClassName("active");
                 console.log(active);
                 ocultar_slider_actual(active[0]);
 
                 let height_global_d = dame_equivalencia_owlheight(pagina);
                 let transform_global_d = dame_equivalencia_transform(pagina);
-
 
                 let padre = document.getElementsByClassName("owl-stage-outer owl-height");
 
@@ -71,28 +73,19 @@ window.onload = function() {
                 let style2 = elemento_padre2.getAttribute('style');
                 console.log("el transform antes de cambiarlo es: " + style2);
 
-
-
-                //cambiamos el valor del atributo 
+                //el valor del atributo ha cambiado y ahora es...
                 //esperar 1 segundo para que se cargue el slider
                 setTimeout(function() {
                     elemento_padre.setAttribute('style', 'height:' + height_global_d);
                     console.log('el height es: ' + height_global_d);
                     elemento_padre2.setAttribute('style', 'transform:' + transform_global_d);
                     console.log('el transform es: ' + transform_global_d);
-                    elemento_hover.setAttribute('style', 'padding: 0% 7.5%; margin: 0px 0%; min-height: 335px;');
-                    console.log('el hover es: ' + hover_global_d);
-
-
                 }, 0);
-
-
-
 
                 // ESTE FUNCIONA 
 
                 let contenido_a_mostrar = dame_pagina_para_mostrar(pagina);
-                mostrar_slider_actual(contenido_a_mostrar);
+                mostrar_slider_actual(contenido_a_mostrar, pagina);
 
             } else {
                 console.log('no existe');
@@ -104,8 +97,6 @@ window.onload = function() {
         }
     }
 
-
-    /////////FUNCIONAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////
     // insertar un boton en el dom con el texto compartir debajo del elemento con id=slider_10812
 
     let boton_compartir = document.createElement('button');
@@ -117,6 +108,8 @@ window.onload = function() {
         let url_actual = getUrl();
         alert(url_actual);
     });
+
+    // Funcion para trabajar con el sevidor "php" y enviarle los datos de la pagina actual, el height y el transform
 
     function escribe_fichero(numero_pagina, height_de_pagina, transform) {
 
@@ -139,34 +132,49 @@ window.onload = function() {
         xhr.send(params);
     }
 
-
-
-    function mostrar_slider_actual(active) {
+    // Funcion para mostrar el slider actual, ocultamos la clase active de la pagina 0 y mostramos la clase active de la pagina actual
+    // Se muestra todos los botones que existe con la clase owl-dot y su id del
+    // Cuando actualizamos la pagina, por ejemplo : https:.../?pagina=1, se muestra en la botonera el numero de la pagina actual. 
+    function mostrar_slider_actual(active, pagina) {
         console.log('mostrando el slider actual');
         //añadimos la clase active al elemento active
-        active.classList.add('active');
+        if (pagina != 0) {
+
+            let elementos_clase = document.getElementsByClassName("owl-dot active");
+            elementos_clase[0].classList.remove('active');
+            //mostramos lista de botones
+            let elementos_con_clase = document.getElementsByClassName("owl-dot");
+            pagina = pagina - 1;
+            for (var i = 0; i < elementos_con_clase.length; i++) {
+                //añadimos un atributo data-id a cada elemento de la clase owl-dot
+                let numero_de_pagina = elementos_con_clase[i].getAttribute('data-id');
+                console.log('el numero de pagina es: ' + numero_de_pagina);
+                console.log('la pagina es: ' + pagina);
+
+                if (numero_de_pagina == pagina) {
+                    //añadiendo clase active
+                    console.log('añadiendo clase active');
+
+                    elementos_con_clase[i].classList.add('active');
+                }
+                //console.log(numeros_de_paginas);
+            }
+            // 
+
+        }
+
+
     }
 
-
+    // ocultamos la propiedad "active"
     function ocultar_slider_actual(active) {
         console.log('ocultando el slider actual');
         //eliminamos la clase active del elemento active
         active.classList.remove('active');
-        //le añadimos la clase hidden al elemento active	
-        //active.classList.add('hidden');
+
     }
 
-
-
-
-
-
-    ////////////////////NOOOOOOOOOOOOO FUNCIONAAAAAAAAAAAAAAAAA////////////////////////////////////////////////////////////////
-
-
-
-
-
+    // obtenemos id y nos devuelve la pagina actual
     function dame_pagina_actual() {
         let active = document.querySelector("div.active");
         //obtenemos su data-id
@@ -176,6 +184,7 @@ window.onload = function() {
         return active;
     }
 
+    // nos devuelve el slider que le pedimos. Por ejemplo: quiero el 2, nos devuelve la pagina 2
     function dame_pagina_para_mostrar(num_pagina) {
         //obtenemos todos los elementos con la clase owl-item
         let todos_los_contenidos = document.getElementsByClassName("owl-item");
@@ -189,7 +198,7 @@ window.onload = function() {
 }
 
 
-////////////////ESTO FUNCIONA///////////////////////UEUEUEUEU!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Busca en la url el parametro "pagina" y si existe, muestramelo y si no existe crealo con pagina y su numero 
 
 function existe_parametro_url(numero_pagina) {
     const queryString = window.location.search;
@@ -212,14 +221,15 @@ function existe_parametro_url(numero_pagina) {
 }
 
 
+/* PAGUINA ACTUAL SIN PARAMENTRO ?pagina=_ */
 //https://www.subaquaticamagazine.es/subaquatica-magazine-edicion-adci-septiembre-octubre-2023/
 
-
+// devuelve la url con ?pagina=_
 function getUrl() {
     console.log(window.location.href);
     return window.location.href;
 }
-
+// cuenta los caracteres de la url hasta llegar antes de ?pagina=_ (en este caso 94)
 function encontrar_en_url() {
     let url_actual = getUrl();
     let palabra = "pagina";
@@ -233,21 +243,7 @@ function encontrar_en_url() {
 
 }
 
-function longitud_url() {
-    let url_actual = 'https://www.subaquaticamagazine.es/subaquatica-magazine-edicion-adci-septiembre-octubre-2023/';
-    console.log('url donde buscaremos: ' + url_actual);
-    let longitud = url_actual.length;
-    return longitud;
-}
-
-function devuelve_numerodepagina(position) {
-    let url_actual = getUrl();
-    console.log('url actual: ' + url_actual);
-    let numero = url_actual.slice(20, 2);
-    console.log(url_actual.slice(0, 2));
-    return numero;
-}
-
+// Devuelve la url actual 
 function compararUrl(url) {
     let url_actual = getUrl();
     if (url_actual == url) {
@@ -256,6 +252,9 @@ function compararUrl(url) {
         return false;
     }
 }
+
+
+// devuelve el valor de la pagina actual, en este caso el transform
 
 function dame_equivalencia_transform(paginappp) {
     let transform_global = "valor";
@@ -434,6 +433,7 @@ function dame_equivalencia_transform(paginappp) {
     }
 }
 
+// devuelve el valor de la pagina actual, en este caso el height
 function dame_equivalencia_owlheight(heightttt) {
     let height_global = "valor";
     let num = Number(heightttt);
